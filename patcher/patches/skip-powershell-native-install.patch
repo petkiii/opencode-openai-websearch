@@ -1,0 +1,12 @@
+diff --git i/package.json w/package.json
+index 4fa339926..fa950adcb 100644
+--- i/package.json
++++ w/package.json
+@@ -131,7 +131,6 @@
+     "protobufjs",
+     "tree-sitter",
+     "tree-sitter-bash",
+-    "tree-sitter-powershell",
+     "web-tree-sitter",
+     "electron"
+   ],

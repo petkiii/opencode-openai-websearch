@@ -1,0 +1,15 @@
+{
+  "name": "opencodeweb",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "plugin",
+    "patcher"
+  ],
+  "scripts": {
+    "build": "bun install && bun run patch -- --build",
+    "patch": "bun patcher/patcher.ts",
+    "typecheck": "bun run --cwd plugin typecheck"
+  }
+}

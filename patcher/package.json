@@ -1,0 +1,14 @@
+{
+  "name": "patcher",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "patch": "bun patcher.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
