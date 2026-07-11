@@ -258,6 +258,7 @@ export const OpenAIWebSearch: ServerPlugin = async (
       input: ToolResultInput,
       output: ToolResultOutput,
     ) => {
+      if (input.model.providerID !== "openai") return;
       if (input.tool !== TOOL_NAME) return;
 
       const parsed = parseWebSearchOutput(input.rawOutput);

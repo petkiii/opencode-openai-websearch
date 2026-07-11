@@ -295,7 +295,7 @@ async function main() {
       return;
     }
 
-    await $`git commit -m ${`chore: apply local patches (${patchedTag})`}`;
+    await $`git -c user.name=opencode-openai-websearch -c user.email=opencode-openai-websearch@localhost commit -m ${`chore: apply local patches (${patchedTag})`}`;
   });
 
   await run(`Create/update git tag ${patchedTag}`, async () => {

@@ -2,9 +2,10 @@
 
 OpenAI-native web search for OpenCode.
 
-This project adds OpenAI's provider-native web search tool to OpenCode requests without replacing OpenCode's normal agent and tool flow. The approach: patch a local OpenCode checkout to expose the missing request/result hooks, then load a normal OpenCode plugin that injects `web_search` for OpenAI models and formats provider-executed search results for OpenCode history.
+This project adds OpenAI's provider-native web search tool to OpenCode requests without replacing OpenCode's normal agent and tool flow.  
+The approach: patch a local OpenCode checkout to expose the missing request/result hooks, then load a normal OpenCode plugin that injects `web_search` for OpenAI models and formats provider-executed search results for OpenCode history.
 
-## INSTALL
+## Install
 
 Requirements:
 
@@ -61,7 +62,7 @@ Add the plugin to OpenCode config. Use an absolute path in global config:
 
 Restart OpenCode after changing config.
 
-## USAGE: patching workflow
+## Usage
 
 Normal update flow:
 
@@ -88,7 +89,7 @@ bun patcher/patcher.ts --build
 - No flags: clone/update OpenCode, install dependencies, apply patches, and stamp versions.
 - `--build`: default steps plus build and binary verification.
 
-## FEATURES
+## Features
 
 - Adds OpenAI provider-native `web_search` to OpenAI model requests.
 - Keeps OpenCode's normal tools and agent flow in place.
@@ -108,7 +109,7 @@ Plugin options:
 }
 ```
 
-## HOW DOES IT WORK
+## How does it work?
 
 The plugin lives at `plugin/src/index.ts`.
 
@@ -120,9 +121,9 @@ The patches live in `patcher/patches/`:
 
 - `chat-request-transform.patch` adds the request transform hook before OpenCode calls `streamText`.
 - `chat-tool-result-transform.patch` adds the tool-result transform hook before OpenCode stores completed tool output.
-- `skip-powershell-native-install.patch` removes `tree-sitter-powershell` from OpenCode'r trusted dependency list. OpenCode loads its bundled WASM parser, so compiling its Node binding is unnecessary and can fail when Bun cannot resolve `node-gyp` during a clean install.
+- `skip-powershell-native-install.patch` removes `tree-sitter-powershell` from OpenCode's trusted dependency list. OpenCode loads its bundled WASM parser, so compiling its Node binding is unnecessary and can fail when Bun cannot resolve `node-gyp` during a clean install.
 
-## Why not just the OpenCode plugin SDK?
+## Why not just use the OpenCode plugin SDK?
 
 The public/current plugin hook surface alone is not enough for this feature.
 

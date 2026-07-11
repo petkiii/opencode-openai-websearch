@@ -10,6 +10,7 @@
   "scripts": {
     "build": "bun install && bun run patch -- --build",
     "patch": "bun patcher/patcher.ts",
+    "test": "bun run --cwd plugin test",
     "typecheck": "bun run --cwd plugin typecheck"
   }
 }
