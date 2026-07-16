@@ -1,9 +1,14 @@
+
 # opencode-openai-websearch
 
 OpenAI-native web search for OpenCode.
 
 This project adds OpenAI's provider-native web search tool to OpenCode requests without replacing OpenCode's normal agent and tool flow.  
 The approach: patch a local OpenCode checkout to expose the missing request/result hooks, then load a normal OpenCode plugin that injects `web_search` for OpenAI models and formats provider-executed search results for OpenCode history.
+
+<p align="center">
+  <img width="888" height="677" alt="screenshot-2026-07-09_22-16-55" src="https://github.com/user-attachments/assets/8d8cf61c-8026-4d24-ab32-7e129f7abfc7" />
+</p>
 
 ## Install
 
