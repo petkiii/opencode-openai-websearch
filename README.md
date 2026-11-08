@@ -1,109 +1,51 @@
-
 # opencode-openai-websearch
 
-OpenAI-native web search for OpenCode.
-
-This project adds OpenAI's provider-native web search tool to OpenCode requests without replacing OpenCode's normal agent and tool flow.  
-The approach: patch a local OpenCode checkout to expose the missing request/result hooks, then load a normal OpenCode plugin that injects `web_search` for OpenAI models and formats provider-executed search results for OpenCode history.
-
-<p align="center">
-  <img width="888" height="677" alt="screenshot-2026-07-09_22-16-55" src="https://github.com/user-attachments/assets/8d8cf61c-8026-4d24-ab32-7e129f7abfc7" />
-</p>
+OpenAI-native web search for OpenCode V2. The plugin adds OpenAI's hosted `web_search` to the normal model request while keeping OpenCode's local tools, MCP tools, and agent loop available.
 
 ## Install
 
-Requirements:
-
-- Bun.
-- Git.
-
-Clone and build:
+Requirements: OpenCode V2 (compatibility baseline **2.2.2**), Bun **1.4.4+**, and Git. V1 is not supported.
 
 ```sh
 git clone https://github.com/petkii/opencode-openai-websearch.git
 cd opencode-openai-websearch
-bun run build
+bun install --frozen-lockfile --ignore-scripts --omit=peer
 ```
 
-`bun run build` installs workspace dependencies, creates or updates `./opencode`, applies patches on branch `local/patch`, and builds a patched OpenCode binary.
-
-Run the built binary, use the binary path printed by the build.
-For example:
-
-```sh
-./opencode/packages/opencode/dist/opencode-linux-x64/bin/opencode
-```
-
-Optionally make it available as `opencodeweb`.
-
-Create a symlink in a directory already on your `PATH`.
-For example:
-
-```sh
-ln -sf "$PWD/opencode/packages/opencode/dist/opencode-linux-x64/bin/opencode" "$HOME/.local/bin/opencodeweb"
-```
-
-Or define a shell alias:
-
-```sh
-alias opencodeweb="$PWD/opencode/packages/opencode/dist/opencode-linux-x64/bin/opencode"
-```
-
-Add the plugin to OpenCode config. Use an absolute path in global config:
+Add the plugin to your OpenCode configuration using an absolute path for global configuration:
 
 ```json
 {
-  "$schema": "https://opencode.ai/config.json",
-  "plugin": [
-    [
-      "/absolute/path/to/opencode-openai-websearch/plugin",
-      {
+  "plugins": [
+    {
+      "package": "/absolute/path/to/opencode-openai-websearch",
+      "options": {
         "searchContextSize": "medium"
       }
-    ]
+    }
   ]
 }
 ```
 
-Restart OpenCode after changing config.
+Restart OpenCode after configuration changes.
 
-## Usage
+## ChatGPT subscription login
 
-Normal update flow:
+In OpenCode, run `/connect`, select **OpenAI**, and choose **Sign in with ChatGPT**, **Codex browser (legacy)**, or **Codex device code (legacy)**. Then select an available model with `/models`.
 
-```sh
-bun run build
-```
+The new login uses HTTP Responses requests with ChatGPT plan authorization. Legacy Codex login normally uses WebSocket requests with HTTP fallback. The plugin supports both transports. API-key Responses requests under provider `openai` follow the same hook path, but separate API billing applies.
 
-What it does:
+The native tool is named `web_search`. OpenCode's ordinary `websearch` tool remains available. An optional hint asks the model to prefer native search. The model chooses whether to search on each request.
 
-- Clones `anomalyco/opencode` into `./opencode` if missing.
-- Fetches upstream tags and picks the latest non-patched version tag.
-- Checks out or creates `local/patch` in `./opencode`.
-- Applies `patcher/patches/*.patch`.
-- Stamps OpenCode package versions with `-patched`.
-- Builds a standalone OpenCode binary and verifies its version.
+Citations are not formatted.
 
-Patcher stages can also be run directly:
+## Permissions
 
-```sh
-bun patcher/patcher.ts
-bun patcher/patcher.ts --build
-```
+The plugin uses OpenCode's existing **`websearch`** permission action.
 
-- No flags: clone/update OpenCode, install dependencies, apply patches, and stamp versions.
-- `--build`: default steps plus build and binary verification.
+## Options
 
-## Features
-
-- Adds OpenAI provider-native `web_search` to OpenAI model requests.
-- Keeps OpenCode's normal tools and agent flow in place.
-- Formats provider-executed search results into OpenCode-visible tool output.
-- Supports `searchContextSize`: `low`, `medium`, or `high`.
-- Supports optional system hint insertion with `addSystemHint`.
-- Does nothing for non-OpenAI providers.
-
-Plugin options:
+Defaults:
 
 ```json
 {
@@ -114,37 +56,8 @@ Plugin options:
 }
 ```
 
-## How does it work?
+`searchContextSize` accepts `low`, `medium`, or `high` and defaults to `medium`. Existing provider-native search declarations keep their settings. Debug logging records hook decisions only, without credentials, prompts, or search content.
 
-The plugin lives at `plugin/src/index.ts`.
+## Web search history
 
-For each OpenAI request, it uses the patched `experimental.chat.request.transform` hook to add `openai.tools.webSearch()` as `web_search`. The request still goes through OpenCode's existing `streamText` path, so normal OpenCode tools remain part of the same turn.
-
-When OpenAI executes web search provider-side, the patched `experimental.chat.tool.result.transform` hook gives the plugin the raw provider output. The plugin extracts the search action and sources, then rewrites the OpenCode tool result so history and UI can display useful source output.
-
-The patches live in `patcher/patches/`:
-
-- `chat-request-transform.patch` adds the request transform hook before OpenCode calls `streamText`.
-- `chat-tool-result-transform.patch` adds the tool-result transform hook before OpenCode stores completed tool output.
-- `skip-powershell-native-install.patch` removes `tree-sitter-powershell` from OpenCode's trusted dependency list. OpenCode loads its bundled WASM parser, so compiling its Node binding is unnecessary and can fail when Bun cannot resolve `node-gyp` during a clean install.
-
-## Why not just use the OpenCode plugin SDK?
-
-The public/current plugin hook surface alone is not enough for this feature.
-
-The plugin needs two things OpenCode did not expose here:
-
-- Mutate the provider request immediately before `streamText`, so OpenAI's native web search tool can be attached.
-- Receive provider-executed web search output before OpenCode stores the completed tool result, so sources can be normalized for history/UI.
-
-The local patches add those missing hook points. If OpenCode later ships equivalent hooks upstream, this repo can drop some or all of the patching layer.
-
-## Uninstall
-
-- Remove the plugin entry from OpenCode config.
-- Remove the symlink if used.
-- Delete `opencode-openai-websearch` repo.
-
-## NOTE
-
-Heavily videcoded, no guarantees.
+The plugin restores previous searches to OpenAI's native format for follow-ups and resumed sessions. Stored transcripts are unchanged.

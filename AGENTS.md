@@ -1,8 +1,8 @@
 # AGENTS.md
 
-## Project
+## Goal
 
-Goal: make OpenAI-native web search work in opencode without replacing opencode's normal agent/tool flow. The current approach patches the local opencode checkout to add missing tool-call/request hooks, then uses those hooks from the `opencode-openai-websearch` plugin. The plugin injects OpenAI's provider-native web search tool into chat requests and formats provider-executed web search results so opencode can store and display them correctly.
+Enable OpenCode agents to use OpenAI-native web search through the user's ChatGPT subscription alongside their normal local and MCP tools. Keep search access governed by OpenCode's permissions and search history usable across follow-ups and resumed sessions. Users should be able to run stock OpenCode.
 
 ## Web search
 
