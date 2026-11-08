@@ -1,0 +1,7 @@
+[install]
+registry = "https://registry.npmjs.org"
+# Server-only plugin: do not install the SDK's optional GUI/TUI peers.
+peer = false
+ignoreScripts = true
+minimumReleaseAge = 604800
+auto = "disable"
